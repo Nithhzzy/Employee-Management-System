@@ -115,10 +115,10 @@ public class EmployeeManagementSystem {
 
             switch (choice) {
                 case 1:
-                    manageEmployees();
+                    EmployeeManagementSystem();
                     break;
                 case 2:
-                    managePositions();
+                    EmpPositions();
                     break;
                 case 3:
                     System.out.println("Exiting...");
@@ -130,7 +130,7 @@ public class EmployeeManagementSystem {
         } while (choice != 3);
     }
 
-    private static void manageEmployees() {
+    private static void EmployeeManagementSystem() {
         int choice;
         do {
             System.out.println("\nEmployee Management Menu:");
@@ -165,7 +165,7 @@ public class EmployeeManagementSystem {
         } while (choice != 5);
     }
 
-    private static void managePositions() {
+    private static void EmpPositions() {
         int choice;
         do {
             System.out.println("\nPosition Management Menu:");
@@ -225,7 +225,7 @@ public class EmployeeManagementSystem {
         }
     }
 
-    private static void updateEmployee() {
+    private static void updateEmp() {
         System.out.print("Enter employee ID to update: ");
         int id = scanner.nextInt();
         scanner.nextLine(); // Consume newline
@@ -250,7 +250,7 @@ public class EmployeeManagementSystem {
         }
     }
 
-    private static void deleteEmployee() {
+    private static void deleteEmp() {
         System.out.print("Enter employee ID to delete: ");
         int id = scanner.nextInt();
         scanner.nextLine(); // Consume newline
