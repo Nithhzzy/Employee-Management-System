@@ -1,336 +1,145 @@
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
-class Employee implements Serializable {
-    private String name;
-    private int id;
-    private String position;
+class Application {
+    private final String name;
+    private final String username;
+    private final String password;
+    private final String position;
+    private final double salary;
 
-    public Employee(String name, int id, String position) {
-        this.name = name; // user
-        this.id = id; // staff 
+    public Application(String name, String username, String password, String position, double salary) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
         this.position = position;
+        this.salary = salary;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getId() {
-        return id;
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getPosition() {
         return position;
     }
 
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "name='" + name + '\'' +
-                ", id=" + id +
-                ", position='" + position + '\'' +
-                '}';
-    }
-}
-
-class Position implements Serializable {
-    private String title;
-    private String responsibilities;
-
-    public Position(String title, String responsibilities) {
-        this.title = title;
-        this.responsibilities = responsibilities;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getResponsibilities() {
-        return responsibilities;
+    public double getSalary() {
+        return salary;
     }
 
     @Override
     public String toString() {
-        return "Position{" +
-                "title='" + title + '\'' +
-                ", responsibilities='" + responsibilities + '\'' +
-                '}';
+        return "Name: " + name + ", Username: " + username + ", Position: " + position + ", Salary: " + salary;
+    }
+
+    public boolean authenticate(String username, String password) {
+        return this.username.equals(username) && this.password.equals(password);
     }
 }
 
-public class EmployeeManagementSystem {
-    private static final String FILE_NAME = "data.ser";
-    private static List<Employee> employees = new ArrayList<>();
-    private static List<Position> positions = new ArrayList<>();
-    private static Scanner scanner = new Scanner(System.in);
+class EmployeeManagementSystem {
+    private final Map<String, Application> employees;
+    private final Scanner scanner;
 
-    public static void main(String[] args) {
-        loadDataFromFile();
-        login();
+    public EmployeeManagementSystem() {
+        employees = new HashMap<>();
+        scanner = new Scanner(System.in);
     }
 
-    private static void loadDataFromFile() {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
-            employees = (List<Employee>) in.readObject();
-            positions = (List<Position>) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("No existing data found. Starting fresh.");
+    public void addEmployee(String name, String username, String password, String position, double salary) {
+        Application employee = new Application(name, username, password, position, salary);
+        employees.put(username, employee);
+        System.out.println("Employee added successfully.");
+    }
+
+    public void displayEmployees() {
+        System.out.println("Employee List:");
+        for (Application employee : employees.values()) {
+            System.out.println(employee);
         }
     }
 
-    private static void saveDataToFile() {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
-            out.writeObject(employees);
-            out.writeObject(positions);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void login() {
-        System.out.println("Welcome to Employee Management System");
+    public void login() {
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
-        // You can implement authentication logic here
+        Application loggedInUser = null;
+        for (Application employee : employees.values()) {
+            if (employee.authenticate(username, password)) {
+                loggedInUser = employee;
+                break;
+            }
+        }
 
-        // For simplicity, let's assume any input is valid for now
-        displayMainMenu();
+        if (loggedInUser != null) {
+            System.out.println("Welcome, " + loggedInUser.getUsername() + "!");
+            System.out.println("Your position is: " + loggedInUser.getPosition());
+        } else {
+            System.out.println("Invalid username or password. Please try again.");
+        }
     }
+}
 
-    private static void displayMainMenu() {
-        int choice;
-        do {
-            System.out.println("\nMain Menu:");
-            System.out.println("1. Manage Employees");
-            System.out.println("2. Manage Positions");
-            System.out.println("3. Exit");
+public class ApplicationMain {
+    public static void main(String[] args) {
+        EmployeeManagementSystem system = new EmployeeManagementSystem();
+        system.addEmployee("Som Nang", "nang", "123", "Tester", 30000);
+        system.addEmployee("Ro Ma", "roma", "123", "Developer", 60000);
+        system.addEmployee("Nithh", "nith", "123", "Coder", 80000);
+
+        boolean exit = false;
+        Scanner scanner = new Scanner(System.in);
+        while (!exit) {
+            System.out.println("\nEmployee Management System");
+            System.out.println("1. Login");
+            System.out.println("2. Add Employee");
+            System.out.println("3. Display Employees");
+            System.out.println("4. Exit");
             System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
+            int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
 
             switch (choice) {
                 case 1:
-                    EmployeeManagementSystem();
+                    system.login();
                     break;
                 case 2:
-                    EmpPositions();
+                    System.out.println("Enter employee name: ");
+                    String name = scanner.nextLine();
+                    System.out.println("Enter username: ");
+                    String username = scanner.nextLine();
+                    System.out.println("Enter password: ");
+                    String password = scanner.nextLine();
+                    System.out.println("Enter position: ");
+                    String position = scanner.nextLine();
+                    System.out.println("Enter salary: ");
+                    double salary = scanner.nextDouble();
+                    scanner.nextLine(); // Consume newline
+                    system.addEmployee(name, username, password, position, salary);
                     break;
                 case 3:
+                    system.displayEmployees();
+                    break;
+                case 4:
+                    exit = true;
                     System.out.println("Exiting...");
-                    saveDataToFile();
                     break;
                 default:
-                    System.out.println("Invalid choice. Please enter a number between 1 and 3.");
-            }
-        } while (choice != 3);
-    }
-
-    private static void EmployeeManagementSystem() {
-        int choice;
-        do {
-            System.out.println("\nEmployee Management Menu:");
-            System.out.println("1. Add Employee");
-            System.out.println("2. View Employees");
-            System.out.println("3. Update Employee");
-            System.out.println("4. Delete Employee");
-            System.out.println("5. Back to Main Menu");
-            System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-
-            switch (choice) {
-                case 1:
-                    addEmployee();
-                    break;
-                case 2:
-                    viewEmployees();
-                    break;
-                case 3:
-                    updateEmployee();
-                    break;
-                case 4:
-                    deleteEmployee();
-                    break;
-                case 5:
-                    System.out.println("Returning to Main Menu...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please enter a number between 1 and 5.");
-            }
-        } while (choice != 5);
-    }
-
-    private static void EmpPositions() {
-        int choice;
-        do {
-            System.out.println("\nPosition Management Menu:");
-            System.out.println("1. Add Position");
-            System.out.println("2. View Positions");
-            System.out.println("3. Update Position");
-            System.out.println("4. Delete Position");
-            System.out.println("5. Back to Main Menu");
-            System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-
-            switch (choice) {
-                case 1:
-                    addPosition();
-                    break;
-                case 2:
-                    viewPositions();
-                    break;
-                case 3:
-                    updatePosition();
-                    break;
-                case 4:
-                    deletePosition();
-                    break;
-                case 5:
-                    System.out.println("Returning to Main Menu...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please enter a number between 1 and 5.");
-            }
-        } while (choice != 5);
-    }
-
-    private static void addEmployee() {
-        System.out.print("Enter employee name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter employee ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-        System.out.print("Enter employee position: ");
-        String position = scanner.nextLine();
-
-        Employee employee = new Employee(name, id, position);
-        employees.add(employee);
-        System.out.println("Employee added successfully.");
-    }
-
-    private static void viewEmployees() {
-        if (employees.isEmpty()) {
-            System.out.println("No employees found.");
-        } else {
-            System.out.println("\nList of Employees:");
-            for (Employee employee : employees) {
-                System.out.println(employee);
+                    System.out.println("Invalid choice. Please try again.");
             }
         }
-    }
-
-    private static void updateEmp() {
-        System.out.print("Enter employee ID to update: ");
-        int id = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-
-        boolean found = false;
-        for (Employee employee : employees) {
-            if (employee.getId() == id) {
-                System.out.print("Enter new name: ");
-                String name = scanner.nextLine();
-                System.out.print("Enter new position: ");
-                String position = scanner.nextLine();
-
-                employee.name = name;
-                employee.position = position;
-                System.out.println("Employee updated successfully.");
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            System.out.println("Employee with ID " + id + " not found.");
-        }
-    }
-
-    private static void deleteEmp() {
-        System.out.print("Enter employee ID to delete: ");
-        int id = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-
-        Iterator<Employee> iterator = employees.iterator();
-        boolean found = false;
-        while (iterator.hasNext()) {
-            Employee employee = iterator.next();
-            if (employee.getId() == id) {
-                iterator.remove();
-                System.out.println("Employee deleted successfully.");
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            System.out.println("Employee with ID " + id + " not found.");
-        }
-    }
-
-    private static void addPosition() {
-        System.out.print("Enter position title: ");
-        String title = scanner.nextLine();
-        System.out.print("Enter position responsibilities: ");
-        String responsibilities = scanner.nextLine();
-
-        Position position = new Position(title, responsibilities);
-        positions.add(position);
-        System.out.println("Position added successfully.");
-    }
-
-    private static void viewPositions() {
-        if (positions.isEmpty()) {
-            System.out.println("No positions found.");
-        } else {
-            System.out.println("\nList of Positions:");
-            for (Position position : positions) {
-                System.out.println(position);
-            }
-        }
-    }
-
-    private static void updatePosition() {
-        System.out.print("Enter position title to update: ");
-        String title = scanner.nextLine();
-
-        boolean found = false;
-        for (Position position : positions) {
-            if (position.getTitle().equalsIgnoreCase(title)) {
-                System.out.print("Enter new responsibilities: ");
-                String responsibilities = scanner.nextLine();
-
-                position.responsibilities = responsibilities;
-                System.out.println("Position updated successfully.");
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            System.out.println("Position with title " + title + " not found.");
-        }
-    }
-
-    private static void deletePosition() {
-        System.out.print("Enter position title to delete: ");
-        String title = scanner.nextLine();
-
-        Iterator<Position> iterator = positions.iterator();
-        boolean found = false;
-        while (iterator.hasNext()) {
-            Position position = iterator.next();
-            if (position.getTitle().equalsIgnoreCase(title)) {
-                iterator.remove();
-                System.out.println("Position deleted successfully.");
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            System.out.println("Position with title " + title + " not found.");
-        }
+        scanner.close();
     }
 }
