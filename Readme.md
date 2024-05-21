@@ -8,7 +8,7 @@ If you have any feedback, please reach out to us at [Discord Server](https://dis
 
 ## License
 
-This project is licensed under the [MIT License](https://choosealicense.com/licenses/apache-2.0/)
+This project is licensed under the [Apeche License](https://choosealicense.com/licenses/apache-2.0/)
 
 ### Thanks For Using Our Code! Please Give it a Star and give credit
 Your support is appreciated! 🌟
